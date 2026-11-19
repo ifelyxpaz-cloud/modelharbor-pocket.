@@ -1,5 +1,6 @@
-const CACHE='modelharbor-pocket-shell-v2';
+// v0.3: network-first for navigation prevents stale app versions after GitHub Pages deploys.
+const CACHE='modelharbor-pocket-shell-v3';
 const ASSETS=['./','./index.html','./manifest.webmanifest','./icon.svg','./apple-touch-icon.png'];
 self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(ASSETS)));self.skipWaiting();});
 self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(x=>x.startsWith('modelharbor-pocket-shell-')&&x!==CACHE).map(x=>caches.delete(x)))));self.clients.claim();});
-self.addEventListener('fetch',event=>{const r=event.request;if(r.method!=='GET'||new URL(r.url).origin!==self.location.origin)return;event.respondWith(caches.match(r).then(cached=>cached||fetch(r)));});
+self.addEventListener('fetch',event=>{const r=event.request;if(r.method!=='GET'||new URL(r.url).origin!==self.location.origin)return;const u=new URL(r.url);if(r.mode==='navigate'||u.pathname.endsWith('/index.html')){event.respondWith(fetch(r).then(response=>{if(response.ok){const copy=response.clone();event.waitUntil(caches.open(CACHE).then(cache=>cache.put('./index.html',copy)));}return response;}).catch(()=>caches.match('./index.html')));return;}event.respondWith(caches.match(r).then(cached=>cached||fetch(r).then(response=>{if(response.ok){const copy=response.clone();event.waitUntil(caches.open(CACHE).then(cache=>cache.put(r,copy)));}return response;})));});
