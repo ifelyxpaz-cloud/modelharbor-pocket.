@@ -1,5 +1,5 @@
-// v0.3: network-first for navigation prevents stale app versions after GitHub Pages deploys.
-const CACHE='modelharbor-pocket-shell-v3';
+// v0.5: network-first for navigation prevents stale app versions after GitHub Pages deploys.
+const CACHE='modelharbor-pocket-shell-v5';
 const ASSETS=['./','./index.html','./manifest.webmanifest','./icon.svg','./apple-touch-icon.png'];
 self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(ASSETS)));self.skipWaiting();});
 self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(x=>x.startsWith('modelharbor-pocket-shell-')&&x!==CACHE).map(x=>caches.delete(x)))));self.clients.claim();});
